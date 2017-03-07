@@ -4,17 +4,17 @@ $(document).ready(function() {
     $('#submitBtn').attr('disabled','disabled');
     $('#password2').attr('disabled','disabled');
     var p1,p2;
-    var last_q='';
-    $('#password1').on('keyup', function(){
+    $('#password1').on('keydown keyup keypress blur change focus', function(){
       p1 = $('#password1').val();
       p2 = $('#password2').val();
-      minReq(p1);
-      test(p1,p2);
+      if(minReq(p1))
+        test(p1,p2);
     });
-    $('#password2').on('keyup', function(){
+    $('#password2').on('keyup blur change', function(){
       p1 = $('#password1').val();
       p2 = $('#password2').val();
-      test(p1,p2);
+      if(minReq(p1))
+        test(p1,p2);
     });
     $('#submitBtn').on('click',function(){
       var status = jQuery('#msg').html();
@@ -54,23 +54,29 @@ function minReq(p)
     $('#warning').removeClass().html('');
     $('#suggestions').html(htmlSuggestion);
     $('#results').removeClass().addClass('bs-callout bs-callout-danger').show();
-    $('#submitBtn').attr('disabled','disabled');
-    $('#password2').attr('disabled','disabled');
+    $('#submitBtn').attr('disabled','disabled').removeClass().addClass('btn btn-default');
+    $('#password2').val('').attr('disabled','disabled');
+    return false;
   }
   else
   {
     $('#results').removeClass().hide();
     $('#password2').removeAttr('disabled');
+    return true;
   }
 }
+
 function test(p1,p2)
 {
-  console.log(p1+":::"+p2);
+  //console.log(p1+":::"+p2);
   if(p1=='' && p2=='')
-    $('#results').hide();
-  else if(p2 !== p1 && p2!=''){
+     $('#results').hide();
+  else if(p2 !== p1){
     emptyResults();
   }
+  // else if(p2 !== p1 && p2!=''){
+  //   emptyResults();
+  // }
   else if(p2 == p1){
     //last_q = p2;
     r = zxcvbn(p2);
@@ -78,6 +84,7 @@ function test(p1,p2)
     analyseResult(r);
   }
 }
+
 function emptyResults()
 {
   $('#submitBtn').attr('disabled','disabled').removeClass().addClass('btn btn-default');
@@ -86,6 +93,7 @@ function emptyResults()
   $('#warning').html('');
   $('#results').removeClass().addClass('bs-callout bs-callout-danger').show();
 }
+
 function analyseResult(r)
 {
   var htmlSuggestion, htmlWarning;
